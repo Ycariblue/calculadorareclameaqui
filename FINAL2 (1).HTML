@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Reclame AQUI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+        }
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .image-container img {
+            width: 100px;
+            height: auto;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            height: auto;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .footer a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="images (4).png" alt="Logo Reclame Aqui Esquerda">
+            <img src="images (4).png" alt="Logo Reclame Aqui Direita">
+        </div>
+
+        <h1>Calculadora Reclame AQUI</h1>
+
+        <div class="image-container">
+            <img src="clc.png" alt="Imagem 1">
+            <img src="clc.png" alt="Imagem 2">
+        </div>
+
+        <form id="calculadora-form">
+            <h3>Dados Necessários</h3>
+
+            <label for="num-reclamacoes-total">Número Total de Reclamações</label>
+            <input type="number" id="num-reclamacoes-total" min="1" required>
+
+            <label for="reclamacoes-resolvidas">Número de Reclamações Resolvidas</label>
+            <input type="number" id="reclamacoes-resolvidas" min="0" required>
+
+            <label for="notas">Notas Atribuídas (separadas por vírgula)</label>
+            <textarea id="notas" rows="3" placeholder="Exemplo: 8, 9, 7, 6, 10" required></textarea>
+
+            <label for="indice-resposta">Índice de Resposta (IR) (%)</label>
+            <input type="number" id="indice-resposta" min="0" max="100" step="0.01" required>
+
+            <button type="button" onclick="calcularIndices()">Calcular</button>
+        </form>
+
+        <div id="resultado" class="result" style="display:none;"></div>
+
+        <div class="image-container">
+            <img src="clc.png" alt="Imagem 3">
+            <img src="clc.png" alt="Imagem 4">
+        </div>
+
+        <div class="logo-container">
+            <img src="images (4).png" alt="Logo Reclame Aqui Esquerda">
+            <img src="images (4).png" alt="Logo Reclame Aqui Direita">
+        </div>
+
+        <div class="footer">
+            <p>Desenvolvido por <a href="https://www.linkedin.com/in/wender-carvalho-a48603127/" target="_blank">Wender Carvalho</a></p>
+        </div>
+    </div>
+
+    <script>
+        function calcularIndices() {
+            // Dados fornecidos pelo usuário
+            const numReclamacoesTotal = parseInt(document.getElementById('num-reclamacoes-total').value);
+            const reclamacoesResolvidas = parseInt(document.getElementById('reclamacoes-resolvidas').value);
+            const notas = document.getElementById('notas').value.split(',').map(nota => parseFloat(nota.trim()));
+            const indiceResposta = parseFloat(document.getElementById('indice-resposta').value);
+
+            const resultadoDiv = document.getElementById('resultado');
+
+            // Validação básica
+            if (
+                numReclamacoesTotal < 1 ||
+                reclamacoesResolvidas < 0 ||
+                reclamacoesResolvidas > numReclamacoesTotal ||
+                notas.length === 0 ||
+                indiceResposta < 0 ||
+                indiceResposta > 100
+            ) {
+                resultadoDiv.innerHTML = "Por favor, insira dados válidos para todas as entradas.";
+                resultadoDiv.style.display = "block";
+                return;
+            }
+
+            if (notas.some(isNaN)) {
+                resultadoDiv.innerHTML = "Certifique-se de que todas as notas sejam números válidos.";
+                resultadoDiv.style.display = "block";
+                return;
+            }
+
+            // Cálculo da Média das Avaliações (MA)
+            const somaNotas = notas.reduce((acc, nota) => acc + nota, 0);
+            const ma = somaNotas / notas.length;
+
+            // Cálculo do Índice de Solução (IS)
+            const is = (reclamacoesResolvidas / numReclamacoesTotal) * 100;
+
+            // Cálculo do Índice de Novos Negócios (IN)
+            const inNegocios = (notas.filter(nota => nota >= 7).length / notas.length) * 100; // Considerando que "voltaria a fazer negócios" seja nota >= 7
+
+            // Cálculo da Avaliação Final (AR)
+            const ar = ((indiceResposta * 2) + (ma * 10 * 3) + (is * 3) + (inNegocios * 2)) / 100;
+
+            // Determinar reputação
+            let reputacao = "";
+            if (ar >= 8 && ar <= 10) {
+                reputacao = "ÓTIMO";
+            } else if (ar >= 7 && ar <= 7.9) {
+                reputacao = "BOM";
+            } else if (ar >= 6 && ar <= 6.9) {
+                reputacao = "REGULAR";
+            } else if (ar >= 5 && ar <= 5.9) {
+                reputacao = "RUIM";
+            } else {
+                reputacao = "NÃO RECOMENDADA";
+            }
+
+            // Exibir resultados
+            resultadoDiv.innerHTML = `
+                <p><strong>Média das Avaliações (MA):</strong> ${ma.toFixed(2)}</p>
+                <p><strong>Índice de Solução (IS):</strong> ${is.toFixed(2)}%</p>
+                <p><strong>Índice de Novos Negócios (IN):</strong> ${inNegocios.toFixed(2)}%</p>
+                <p><strong>Avaliação Final (AR):</strong> ${ar.toFixed(2)}</p>
+                <p><strong>Reputação:</strong> ${reputacao}</p>
+            `;
+            resultadoDiv.style.display = "block";
+        }
+    </script>
+</body>
+</html>
